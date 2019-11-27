@@ -1,0 +1,15 @@
+- name: Install additional dependencies
+  apt:
+    name: libopenblas-dev
+    state: latest
+
+- name: Create MSM_HOCR install directory
+  file:
+    path: /opt/msm_hocr/bin
+    state: directory
+
+- name: Download MSM_HOCR 
+  get_url:
+    url: https://github.com/ecr05/MSM_HOCR/releases/download/v3.0FSL/msm_ubuntu_v3
+    dest: /opt/msm_hocr/bin/msm
+    mode: '0755'

@@ -1,0 +1,7 @@
+dependencies:
+  - role: fsl
+  - role: freesurfer
+  - role: connectome_workbench
+  - role: gradunwarp
+  - role: msm_hocr
+  - role: fix

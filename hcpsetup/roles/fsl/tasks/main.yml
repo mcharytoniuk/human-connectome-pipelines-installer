@@ -1,0 +1,27 @@
+- name: Install additional dependencies  
+  apt:
+    name: 
+      - build-essential
+      - python
+    state: latest
+
+- name: Download FMRIB Software Library Installer
+  get_url: 
+    url: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py
+    dest: /tmp/fslinstaller.py
+    mode: '0755'
+
+- name: Check for previous installations
+  command: /opt/fsl/bin/flirt -version
+  ignore_errors: true
+  register: fsl_flirt_version
+
+- name: Clean up previous installation
+  file:
+    path: /opt/fsl
+    state: absent
+  when: "(fsl_flirt_version is failed) or ('FLIRT' not in fsl_flirt_version.stdout)"
+
+- name: Execute FSL Installer
+  command: /usr/bin/python /tmp/fslinstaller.py -E -d /opt/fsl -q
+  when: "(fsl_flirt_version is failed) or ('FLIRT' not in fsl_flirt_version.stdout)"

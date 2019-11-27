@@ -1,0 +1,47 @@
+- name: Install additional dependencies  
+  apt:
+    name: 
+      - octave
+      - octave-io
+      - octave-specfun
+      - octave-general
+      - octave-control
+      - octave-struct
+      - octave-optim
+      - octave-statistics
+      - octave-signal
+      - r-base
+      - r-cran-devtools
+      - r-cran-kernlab
+      - r-cran-rocr
+      - r-cran-class
+#      - r-cran-party
+      - r-cran-e1071
+      - r-cran-randomforest
+    state: latest
+
+- name: Check for previous installations
+  command: cat /opt/fix/fixversion
+  register: fix_version
+
+- name: Clean up previous installation
+  file:
+    path: /opt/fix
+    state: absent
+  when: "(fix_version is failed) or ('1.06.12' not in fix_version.stdout)"
+
+- name: Download FSL FIX
+  unarchive: 
+    src: http://www.fmrib.ox.ac.uk/~steve/ftp/fix.tar.gz
+    dest: /opt
+    remote_src: yes
+  when: "(fix_version is failed) or ('1.06.12' not in fix_version.stdout)"
+ 
+- name: Configure FSL_FIX_* variables in settings.sh
+  replace:
+    path: /opt/fix/settings.sh
+    regexp: '{{ item.pattern }}'
+    replace: '{{ item.replacement }}'
+  with_items:
+    - pattern: 'FSL_FIX_MATLAB_MODE=0'
+      replacement: 'FIX_FIX_MATLAB_MODE=2'

@@ -1,0 +1,5 @@
+# interpreter_python = auto_silentAnsible setup tasks
+
+- hosts: all
+  roles:
+    - role: hcppipelines

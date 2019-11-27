@@ -1,0 +1,17 @@
+- name: Install additional dependencies  
+  apt:
+    name: 
+      - build-essential
+      - python
+    state: latest
+
+- name: Check for previous installation
+  command: cat /opt/HCPpipelines-4.0.1/version.txt
+  register: hcppipelines_output
+
+- name: Download HCP Pipelines
+  unarchive: 
+    src: https://github.com/Washington-University/HCPpipelines/archive/v4.0.1.tar.gz
+    dest: /opt
+    remote_src: yes
+  when: "(hcppipelines_output is failed) or ('v4.0.1' not in hcppipelines_output.stdout)" 

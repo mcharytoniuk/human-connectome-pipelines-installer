@@ -1,0 +1,36 @@
+- name: Install FreeSurfer dependencies
+  apt: 
+    name: libjpeg62
+    state: latest
+
+- name: Check for previous installations
+  command: cat /opt/freesurfer/VERSION
+  ignore_errors: true
+  register: freesurfer_version
+
+- name: Clean up previous installation
+  file:
+    path: /opt/freesurfer
+    state: absent
+  when: "(freesurfer_version is failed) or ('reesurfer-x86_64-unknown-linux-gnu-stable6-20170118' not in freesurfer_version.stdout)"
+
+- name: Download and unpack FreeSurfer
+  unarchive:
+    src: https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
+    dest: /opt
+    remote_src: yes
+  when: "(freesurfer_version is failed) or ('reesurfer-x86_64-unknown-linux-gnu-stable6-20170118' not in freesurfer_version.stdout)"
+
+- name: Run FreeSurfer Setup
+  shell: |
+    export FREESURFER_HOME=/opt/freesurfer && \
+      source $FREESURFER_HOME/SetUpFreeSurfer.sh && \
+      echo $MNI_DIR
+  args:
+    executable: /bin/bash
+  register: freesurfer_setup_output
+
+- name: Assert that FreeSurfer is installed correctly
+  assert:
+    that:
+      - "'/opt/freesurfer/mni' in freesurfer_setup_output.stdout"
